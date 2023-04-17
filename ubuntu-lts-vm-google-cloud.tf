@@ -101,6 +101,6 @@ resource "google_compute_instance" "ubuntu_vm" {
     }
 
 # Enable deletion protection for production
-deletion_protection = true
+    deletion_protection = true
 }
 
