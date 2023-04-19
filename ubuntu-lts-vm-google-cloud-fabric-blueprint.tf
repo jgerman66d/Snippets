@@ -210,11 +210,24 @@ resource "google_compute_instance" "ubuntu_vm" {
     sudo chmod 777 /mnt/nfs
     sudo echo "${google_filestore_instance.filestore.networks.0.ip_addresses.0}:/nfs-share /mnt/nfs nfs defaults,_netdev 0 0" | sudo tee -a /etc/fstab
     sudo mount -a
+
+    # Install the Google Cloud SDK
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    sudo apt-get install apt-transport-https ca-certificates gnupg
+    sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
+    sudo apt-get update && sudo apt-get install google-cloud-sdk
+
     # Configure Active Directory integration
     # Replace the following placeholders with your actual domain details
     DOMAIN_NAME="<YOUR-AD-DOMAIN-NAME>"
-    DOMAIN_ADMIN_USER="<YOUR-AD-DOMAIN-ADMIN-USERNAME>"
-    DOMAIN_ADMIN_PASS="<YOUR-AD-DOMAIN-ADMIN-PASSWORD>"
+    DOMAIN_REALM="$${DOMAIN_NAME^^$}"
+    PROJECT_ID="<YOUR-PROJECT-ID>"
+    SECRET_USERNAME_NAME="<AD-USERNAME-SECRET-NAME>"
+    SECRET_PASSWORD_NAME="<AD-PASSWORD-SECRET-NAME>"
+
+    # Fetch secrets from Google Secret Manager
+    DOMAIN_ADMIN_USER="$(gcloud secrets versions access latest --secret=$SECRET_USERNAME_NAME --project=$PROJECT_ID)"
+    DOMAIN_ADMIN_PASS="$(gcloud secrets versions access latest --secret=$SECRET_PASSWORD_NAME --project=$PROJECT_ID)"
     DOMAIN_REALM="$${DOMAIN_NAME^^$}"
 
     # Install necessary packages for Active Directory authentication
