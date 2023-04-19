@@ -74,12 +74,14 @@ module "firewall" {
 }
 
 # Apply the rules to the VM instances
+# Apply the rules to the VM instances
 resource "google_compute_firewall" "allow_ssh" {
   name        = "allow-ssh"
   network     = google_compute_network.vm_network.self_link
   target_tags = ["vm-instances"]
 
-  # Source ranges default to ["0.0.0.0/0"] if not specified
+  source_ranges = ["10.42.21.13/7"] # Change to your IP address range.
+
   allow {
     protocol = "tcp"
     ports    = ["22"] # 22 for SSH
@@ -91,7 +93,8 @@ resource "google_compute_firewall" "allow_nfs" {
   network     = google_compute_network.vm_network.self_link
   target_tags = ["vm-instances"]
 
-  # Source ranges default to ["0.0.0.0/0"] if not specified
+  source_ranges = ["10.42.21.13/7"] # Change to your IP address range.
+
   allow {
     protocol = "tcp"
     ports    = ["111", "2049"] # 111 and 2049 for NFS
@@ -103,7 +106,8 @@ resource "google_compute_firewall" "allow_smb" {
   network     = google_compute_network.vm_network.self_link
   target_tags = ["vm-instances"]
 
-  # Source ranges default to ["0.0.0.0/0"] if not specified
+  source_ranges = ["10.42.21.13/7"] # Change to your IP address range.
+
   allow {
     protocol = "tcp"
     ports    = ["445"] # 445 for SMB over TCP
