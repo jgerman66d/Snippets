@@ -13,3 +13,8 @@ variable "service_account_file" {}
 variable "allowed_source_ranges" {
   type = list(string)
 }
+variable "ad_admin_username" {}
+variable "ad_admin_password" {}
+variable "ad_domain" {}
+variable "ad_domain_controller" {}
+variable "ad_ou" {}

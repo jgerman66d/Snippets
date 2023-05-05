@@ -5,7 +5,19 @@ resource "google_compute_startup_script" "samba_setup" {
     #!/bin/bash
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
-    apt-get install -y samba gcsfuse
+    apt-get install -y samba gcsfuse realmd sssd sssd-tools samba-common-bin krb5-user packagekit
+
+    # Join Active Directory domain
+    echo "${var.ad_admin_password}" | realm join --user="${var.ad_admin_username}" "${var.ad_domain}" -v --computer-ou="${var.ad_ou}" --install=/
+
+    # Configure Samba for AD authentication
+    sed -i 's/security = user/security = ads/g' /etc/samba/smb.conf
+    echo "  realm = ${var.ad_domain}" >> /etc/samba/smb.conf
+    echo "  password server = ${var.ad_domain_controller}" >> /etc/samba/smb.conf
+    echo "  idmap config * : backend = tdb" >> /etc/samba/smb.conf
+    echo "  idmap config * : range = 10000-99999" >> /etc/samba/smb.conf
+    echo "  winbind use default domain = yes" >> /etc/samba/smb.conf
+    echo "  winbind offline logon = false" >> /etc/samba/smb.conf
 
     # Create directories to mount GCS buckets
     ${formatlist("mkdir -p /mnt/gcs/%s", var.gcs_buckets)}
@@ -57,6 +69,11 @@ variable "instance_name" {}
 variable "gcs_buckets" {
   type = list(string)
 }
+variable "ad_admin_username" {}
+variable "ad_admin_password" {}
+variable "ad_domain" {}
+variable "ad_domain_controller" {}
+variable "ad_ou" {}
 variable "samba_username" {}
 variable "samba_password" {}
 variable "service_account_file" {}
