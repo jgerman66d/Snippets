@@ -22,10 +22,10 @@ OUTPUTFILE=directory_names_to_create.txt
 
 # This command retrieves the list of all objects in the specified bucket, including objects in subdirectories
 # The ** at the end of the bucket name means to recurse through all directories within the bucket
-gsutil ls -r gs://$BUCKET_ID/** | while read BUCKET_OBJ
+gsutil ls -r gs://$BUCKET_ID/** | while read BUCKET_OBJECT
 do   
     # This command prints the directory part of each object's pathname
-    dirname "$BUCKET_OBJ"
+    dirname "$BUCKET_OBJECT"
 done | sort -u > $OUTPUTFILE  # The output is sorted and duplicates are removed, then written to the temporary file
 
 # The next message to be printed to the console
@@ -38,14 +38,14 @@ do
     LOCAL_DIR=`echo "$DIR_NAME" | sed "s=gs://$BUCKET_ID/==" | sed "s=gs://$BUCKET_ID=="`
 
     # This command forms the path where the bucket directory will be 'mounted' in the local filesystem
-    TARG_DIR="$MOUNT_PT/$LOCAL_DIR"
+    TARGET_DIRECTORY="$MOUNT_PT/$LOCAL_DIR"
 
     # This conditional block checks if the directory already exists in the local filesystem
-    if ! [ -d "$TARG_DIR" ]
+    if ! [ -d "$TARGET_DIRECTORY" ]
     then
 	    # If the directory does not exist, it is created
-        echo "Creating $TARG_DIR"
-        mkdir -p "$TARG_DIR"
+        echo "Creating $TARGET_DIRECTORY"
+        mkdir -p "$TARGET_DIRECTORY"
     fi
 done
 
