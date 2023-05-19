@@ -3,7 +3,7 @@
 # those directories in the local filesystem, effectively 'mounting' the bucket structure.
 
 # Default mount point is the "mnt" subdirectory within the /var/file_mounts directory
-MOUNT_PT=${1:-/var/file_mounts/mnt}
+MOUNTING_POINT=${1:-/var/file_mounts/mnt}
 
 # The second argument is the name of the bucket to be mounted
 BUCKET_ID=$2
@@ -38,7 +38,7 @@ do
     LOCAL_DIR=`echo "$DIR_NAME" | sed "s=gs://$BUCKET_ID/==" | sed "s=gs://$BUCKET_ID=="`
 
     # This command forms the path where the bucket directory will be 'mounted' in the local filesystem
-    TARGET_DIRECTORY="$MOUNT_PT/$LOCAL_DIR"
+    TARGET_DIRECTORY="$MOUNTING_POINT/$LOCAL_DIR"
 
     # This conditional block checks if the directory already exists in the local filesystem
     if ! [ -d "$TARGET_DIRECTORY" ]
